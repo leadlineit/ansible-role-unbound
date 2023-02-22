@@ -1,0 +1,68 @@
+# {{ ansible_managed }}
+server:
+
+{% set local_zone_type = item.local_zone_type | default(unbound_local_zone_type) %}
+{% set domains_with_reverses = item.domains_with_reverses | default(unbound_domains_with_reverses) %}
+{% set local_zones = item.local_zones | default(unbound_local_zone) %}
+{% set inventory_domain = item.inventory_domain | default(unbound_inventory_domain) %}
+{% set domains = item.domains | default(unbound_domains) %}
+{% set inventory_domain_with_reverse = item.inventory_domain_with_reverse|default(unbound_inventory_domain_with_reverse) %}
+
+{% for domain in domains_with_reverses %}
+    local-zone: "{{ domain.domain_name }}." {{ local_zone_type[domain.domain_name] | default(unbound_default_local_zone) }}
+{% for subdomain, ip in domain.items() %}
+{% if subdomain != "domain_name" %}
+    local-data: "{{ subdomain }}.{{ domain.domain_name }}. IN A {{ ip }}"
+    local-data-ptr: "{{ ip }} {{ subdomain }}.{{ domain.domain_name }}"
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% for domain in local_zones %}
+    local-zone: "{{ domain }}." {{ local_zone_type[domain] | default(unbound_default_local_zone) }}
+{% endfor %}
+
+{% for group, domain in inventory_domain.items() %}
+    # Group {{group}}
+{% for host in groups[group] %}
+    local-data: "{{ hostvars[host]['inventory_hostname_short'] }}.{{ domain }}. IN A {{ hostvars[host][ 'ansible_ssh_host'] }}"
+{% if inventory_domain_with_reverse %}
+	local-data-ptr: "{{ hostvars[host]['ansible_ssh_host'] }} {{ hostvars[host]['inventory_hostname_short'] }}.{{ domain }}."
+{% endif %}
+{% endfor %}
+{% endfor %}
+
+{% for domain in domains %}
+    local-zone: "{{ domain.domain_name }}." {{ local_zone_type[domain.domain_name] | default(unbound_default_local_zone) }}
+{% for subdomain, entry in domain.items() %}
+{% if subdomain == "domain_rr" %}
+{% for rr in entry %}
+    local-data:     "{{ domain.domain_name }}. {{ rr }}"
+{% endfor %}
+{% elif subdomain != "domain_name" %}
+{% if entry is string %}
+    local-data:     "{{ subdomain }}.{{ domain.domain_name }}. {{ entry }}"
+{% else %}
+{% set entry_ttl = entry.ttl | default('') %}
+{% if entry.ip is string %}
+    local-data:     "{{ subdomain }}.{{ domain.domain_name }}. IN A {{ entry_ttl }} {{ entry.ip }}"
+{% endif %}
+{% if entry.ipv6 is string %}
+    local-data:     "{{ subdomain }}.{{ domain.domain_name }}. IN AAAA {{ entry_ttl }} {{ entry.ipv6 }}"
+{% endif %}
+{% if entry.txt is string %}
+    local-data:     '{{ subdomain }}.{{ domain.domain_name }}. IN TXT {{ entry_ttl }} "{{ entry.txt }}"'
+{% endif %}
+{% for cname in (entry.cnames | default([])) %}
+    local-data:     "{{ cname }}.{{ domain.domain_name }}. IN CNAME {{ entry_ttl }} {{ subdomain }}.{{ domain.domain_name }}."
+{% endfor %}
+{% if entry.reverse | default(false) and entry.ip is string %}
+    local-data-ptr: "{{ entry.ip }} {{ entry_ttl }} {{ subdomain }}.{{ domain.domain_name }}."
+{% endif %}
+{% if entry.reverse | default(false) and entry.ipv6 is string %}
+    local-data-ptr: "{{ entry.ipv6 }} {{ entry_ttl }} {{ subdomain }}.{{ domain.domain_name }}."
+{% endif %}
+{% endif %}
+{% endif %}
+{% endfor %}
+{% endfor %}

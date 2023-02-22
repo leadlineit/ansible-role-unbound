@@ -1,0 +1,11 @@
+---
+- name: Update repo cache and install an Unbound package
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: true
+  with_items:
+    - unbound
+  notify:
+    - Enable unbound service
+    - Restart unbound service

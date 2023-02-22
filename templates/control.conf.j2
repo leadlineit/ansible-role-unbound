@@ -1,0 +1,9 @@
+# {{ ansible_managed }}
+{% if unbound_control_configuration is defined %}
+remote-control:
+{% for config in unbound_control_configuration %}
+{% for key, value in config.items() %}
+    {{ key }}: {{ value }}
+{% endfor %}
+{% endfor %}
+{% endif %}

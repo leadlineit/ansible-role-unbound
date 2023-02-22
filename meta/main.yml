@@ -1,0 +1,20 @@
+---
+galaxy_info:
+  role_name: unbound
+  namespace: leadlineit
+  author: Stas Stavnichuk
+  description: Install and configure Unbound package
+  license: MIT
+  min_ansible_version: '2.11'
+  platforms:
+    - name: Debian
+      versions:
+        - bullseye
+        - buster
+        - stretch
+  galaxy_tags:
+    - system
+    - debian
+    - unbound
+    - network
+    - dns

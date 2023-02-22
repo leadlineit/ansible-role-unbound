@@ -1,0 +1,15 @@
+---
+- name: Enable unbound service
+  ansible.builtin.service:
+    name: unbound
+    enabled: true
+
+- name: Restart unbound service
+  ansible.builtin.service:
+    name: unbound
+    state: restarted
+
+- name: Reload apparmor service
+  ansible.builtin.service:
+    name: apparmor
+    state: reloaded
