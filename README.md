@@ -1,9 +1,16 @@
-# Ansible Role for Unbound package
+# Ansible Galaxy role for install and configure unbound package.
 
 ![Build Status](https://github.com/leadlineit/ansible-role-unbound/actions/workflows/ansible-galaxy-ci.yml/badge.svg)
 [![Galaxy Role](https://img.shields.io/badge/Ansible--Galaxy-leadlineit.unbound-blue.svg?logo=ansible&logoColor=white)](https://galaxy.ansible.com/leadlineit/unbound/)
 
-This role helps to for install and configure Unbound package on a Debian (stretch/buster/bullseye).
+This role helps to install and configure unbound package.
+
+Supported OSes
+--------------
+- Debian 12 (bookworm)
+- Debian 11 (bullseye)
+- Debian 10 (buster)
+- Debian 9 (stretch)
 
 Requirements
 ------------

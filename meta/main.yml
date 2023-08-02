@@ -3,12 +3,13 @@ galaxy_info:
   role_name: unbound
   namespace: leadlineit
   author: Stas Stavnichuk
-  description: Install and configure Unbound package
+  description: Install and configure unbound package
   license: MIT
   min_ansible_version: '2.11'
   platforms:
     - name: Debian
       versions:
+        - bookworm
         - bullseye
         - buster
         - stretch

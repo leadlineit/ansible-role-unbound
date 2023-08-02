@@ -52,6 +52,8 @@
     url: https://www.internic.net/domain/named.cache
     dest: /etc/unbound/root.hints
     mode: '0644'
+    owner: root
+    group: root
 
 - name: Change system nameserver
   when: unbound_resolvconf
@@ -81,6 +83,7 @@
     mode: '0644'
     owner: root
     group: root 
-  with_items: "{{ unbound_zones }}"
+  with_items:
+    - "{{ unbound_zones }}"
   notify:
     - Restart unbound service
